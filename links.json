@@ -7,6 +7,10 @@
     {
       "label": "Sprint Progress",
       "url": "https://dev.azure.com/tr-design/Design%20Organization/_queries/query-charts/0470b6b5-0002-4653-b95d-384fcc3ef68e/"
+    },
+  {
+      "label": "Ask Saffron Delivery Agent",
+      "url": "https://aiplatform.thomsonreuters.com/ai-platform/ai-chains/use/71d797fc-252f-43dd-9b9a-aff25e2cbbee?chain_builder=true"
     }
   ],
   "bookmarks": [
