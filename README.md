@@ -37,6 +37,10 @@ That's it. To get updates later, `git pull` and then click the **reload** icon (
 
 The work item opens in a new tab and the popup closes. The input only accepts digits — anything else is stripped automatically, so a stray letter won't build a broken link.
 
+Additionally, there is 2 buttons to the Current Sprint Backlog items and to the Sprint Progress represented by Graphs on a query pointing to current sprint. At the bottom you will see a Bookmarks dropdown to the most common places in our ADO project.
+
+
+
 ---
 
 ## What's in here
@@ -47,6 +51,8 @@ The work item opens in a new tab and the popup closes. The input only accepts di
 | `popup.html` | The little input box + button you see when you click the toolbar icon. |
 | `popup.js` | Builds the ADO URL from the ID and opens it; also keeps the field digits-only. |
 | `icon16 / 32 / 48 / 128 .png` | Toolbar and extensions-page icons at each size Chrome asks for. |
+| `links.json` | List of labels and links, so they're cleaner to maintain. |
+| `Browser-Extensions.md` | Short explanation about how Browser extensions work and their limitations. Read this for creating your own tools with the help of AI chats. |
 
 ---
 

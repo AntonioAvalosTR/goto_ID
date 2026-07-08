@@ -1,0 +1,30 @@
+{
+  "links": [
+    {
+      "label": "Current Sprint",
+      "url": "https://dev.azure.com/tr-design/Design%20Organization/_sprints/backlog/Saffron%20Design%20System/Design%20Organization/"
+    },
+    {
+      "label": "Sprint Progress",
+      "url": "https://dev.azure.com/tr-design/Design%20Organization/_queries/query-charts/0470b6b5-0002-4653-b95d-384fcc3ef68e/"
+    }
+  ],
+  "bookmarks": [
+    {
+      "label": "Epics Backlog",
+      "url": "https://dev.azure.com/tr-design/Design%20Organization/_backlogs/backlog/Saffron%20Design%20System/Epics?showParents=false"
+    },
+    {
+      "label": "Delivery Plans",
+      "url": "https://dev.azure.com/tr-design/Design%20Organization/_deliveryplans/plans"
+    },
+    {
+      "label": "Queries (Favorites)",
+      "url": "https://dev.azure.com/tr-design/Design%20Organization/_queries/favorites/"
+    },
+    {
+      "label": "Wiki",
+      "url": "https://dev.azure.com/tr-design/Design%20Organization/_wiki/wikis/Design-Organization.wiki/77/Saffron-wiki"
+    }
+  ]
+}

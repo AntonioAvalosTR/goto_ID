@@ -4,14 +4,56 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
-            body { width: 220px; font-family: sans-serif; padding: 10px; }
-            input { width: 100%; box-sizing: border-box; padding: 6px; font-size: 14px; }
-            button { width: 100%; margin-top: 8px; padding: 6px; cursor: pointer; }
+            body { width: 260px; font-family: sans-serif; padding: 10px; }
+            .row { display: flex; gap: 8px; align-items: stretch; }
+            input { flex: 1; min-width: 0; box-sizing: border-box; padding: 6px; font-size: 14px; }
+            button { flex-shrink: 0; padding: 6px 10px; cursor: pointer; }
+            hr { border: none; border-top: 1px solid #ddd; margin: 10px 0; }
+            .links { display: flex; flex-wrap: wrap; gap: 8px; }
+            .links button { flex: 1 1 45%; }
+
+            /* Bookmarks dropdown (Bootstrap-like, no dependency) */
+            .bookmarks { position: relative; margin-top: 8px; }
+            .dropdown-toggle { width: 100%; display: flex; justify-content: space-between; align-items: center; }
+            .caret { transition: transform 0.15s ease; }
+            .dropdown-toggle[aria-expanded="true"] .caret { transform: rotate(180deg); }
+
+            .dropdown-menu {
+                margin-top: 4px;
+                padding: 6px 0;
+                background: #fff;
+                border: 1px solid rgba(0, 0, 0, 0.15);
+                border-radius: 6px;
+                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
+            }
+            .dropdown-menu[hidden] { display: none; }
+
+            .dropdown-item {
+                display: block;
+                padding: 6px 14px;
+                color: #212529;
+                font-size: 14px;
+                text-decoration: none;
+                white-space: nowrap;
+                cursor: pointer;
+            }
+            .dropdown-item:hover,
+            .dropdown-item:focus { background: #f2f2f2; outline: none; }
         </style>
     </head>
     <body>
-        <input id="wid" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="Work item ID" autofocus>
-        <button id="go">Go to ID</button>
+        <div class="row">
+            <input id="wid" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="Work item ID" autofocus>
+            <button id="go">Go to ID</button>
+        </div>
+        <hr>
+        <div id="links" class="links"></div>
+        <div class="bookmarks">
+            <button id="bookmarksToggle" class="dropdown-toggle" aria-expanded="false">
+                Bookmarks <span class="caret">&#9662;</span>
+            </button>
+            <div id="bookmarksMenu" class="dropdown-menu" hidden></div>
+        </div>
         <script src="popup.js"></script>
     </body>
 </html>

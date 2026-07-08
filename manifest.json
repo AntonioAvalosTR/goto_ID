@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Go to ID",
-  "version": "1.0",
-  "description": "Paste a work item's ID number and jump straight to it in Azure DevOps.",
+  "version": "2.0",
+  "description": "Paste a work item's ID number and jump straight to it in Azure DevOps. Plus access to important links.",
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
