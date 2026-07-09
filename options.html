@@ -21,16 +21,17 @@
             .add-row input { flex: 1 1 0; min-width: 0; }
             .add-row button { flex-shrink: 0; }
 
-            .bookmark { display: flex; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee; }
-            .bookmark .meta { flex: 1; min-width: 0; }
-            .bookmark .label { font-size: 14px; font-weight: 600; }
-            .bookmark .url { font-size: 12px; color: #666; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-            .bookmark .remove { flex-shrink: 0; color: #b00020; background: #fff; border: 1px solid #ddd; border-radius: 4px; }
+            /* Shared editable-list styling (Quick links + Bookmarks) */
+            .list-item { display: flex; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee; }
+            .list-item .meta { flex: 1; min-width: 0; }
+            .list-item .label { font-size: 14px; font-weight: 600; }
+            .list-item .url { font-size: 12px; color: #666; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+            .list-item .remove { flex-shrink: 0; color: #b00020; background: #fff; border: 1px solid #ddd; border-radius: 4px; }
         </style>
     </head>
     <body>
         <h1>Go to ID — Settings</h1>
-        <p class="hint">These settings are saved in your browser. (Note: the popup does not read them yet — that wiring is a separate step.)</p>
+        <p class="hint">These settings are saved in your browser and used by the popup.</p>
 
         <h2>Azure DevOps target</h2>
 
@@ -53,8 +54,22 @@
 
         <hr>
 
+        <h2>Quick links</h2>
+        <div class="hint">The buttons shown under the input in the popup. The newest one is added to the top.</div>
+
+        <div class="add-row">
+            <input id="newLinkLabel" type="text" placeholder="Label (e.g. Current Sprint)">
+            <input id="newLinkUrl" type="text" placeholder="https://…">
+            <button id="addLink">Add</button>
+        </div>
+        <div id="addLinkError" class="error"></div>
+
+        <div id="linkList"></div>
+
+        <hr>
+
         <h2>Bookmarks</h2>
-        <div class="hint">These are the entries for the popup's Bookmarks dropdown. The newest one is added to the top.</div>
+        <div class="hint">The entries for the popup's Bookmarks dropdown. The newest one is added to the top.</div>
 
         <div class="add-row">
             <input id="newLabel" type="text" placeholder="Label (e.g. Wiki)">

@@ -83,11 +83,10 @@ function buildMenuItems(items, container) {
 }
 
 // --- Load config + content ---
-// Settings come from chrome.storage (options page), falling back to DEFAULTS.
-// Quick links always come from links.json. Bookmarks come from storage if the
-// options page has been used, otherwise they fall back to links.json.
+// Settings, quick links, and bookmarks all come from chrome.storage (options page).
+// Each falls back to the bundled defaults (DEFAULTS / links.json) if never customized.
 async function init() {
-  const stored = await chrome.storage.sync.get(["settings", "bookmarks"]);
+  const stored = await chrome.storage.sync.get(["settings", "links", "bookmarks"]);
 
   if (stored.settings) {
     config = {
@@ -105,7 +104,10 @@ async function init() {
     console.error("Could not load links.json:", error);
   }
 
-  buildButtons(fileData.links, linksContainer);   // quick-link row (from file)
+  const links = Array.isArray(stored.links)
+    ? stored.links                                // managed via the options page
+    : (fileData.links || []);                     // fallback: bundled defaults
+  buildButtons(links, linksContainer);
 
   const bookmarks = Array.isArray(stored.bookmarks)
     ? stored.bookmarks                            // managed via the options page
