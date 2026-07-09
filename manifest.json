@@ -1,14 +1,19 @@
 {
   "manifest_version": 3,
   "name": "Go to ID",
-  "version": "2.2.1",
-  "description": "Chrome Extension to directly Search in your backlog or paste a work item's ID number and jump straight to it in Azure DevOps.",
+  "version": "3.0",
+  "description": "Type a work item ID to open it directly, or any text to search Azure DevOps. Plus quick links and bookmarks.",
+  "permissions": ["storage"],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
       "16": "img/icon16.png",
       "32": "img/icon32.png"
     }
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
   },
   "icons": {
     "16": "img/icon16.png",

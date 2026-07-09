@@ -1,6 +1,13 @@
-const ORG = "tr-design";
-const PROJECT = "Design%20Organization";   // already URL-encoded (contains a space)
-const AREA_PATH = "designOrg\\Saffron Design System";  // not URL-encoded (contains a space)
+// Fallback defaults (raw, NOT URL-encoded) — used if the options page was never opened.
+// These mirror the DEFAULTS in options.js.
+const DEFAULTS = {
+  org: "tr-design",
+  project: "Design Organization",
+  area: "designOrg\\Saffron Design System",
+};
+
+// Live config, overridden from chrome.storage on load.
+let config = { ...DEFAULTS };
 
 const input = document.getElementById("wid");
 const button = document.getElementById("go");
@@ -19,15 +26,20 @@ function go() {
   const query = input.value.trim();
   if (!query) return;                       // nothing entered, do nothing
 
+  // Encode the configured values at the point of use (they're stored raw).
+  const org = config.org;                   // org slugs have no spaces; used as-is
+  const project = encodeURIComponent(config.project);
+  const area = encodeURIComponent(config.area);
+
   let url;
   if (/^\d+$/.test(query)) {
     // Pure number: treat as a work item ID and open it directly
-    url = `https://dev.azure.com/${ORG}/${PROJECT}/_workitems/edit/${query}`;
+    url = `https://dev.azure.com/${org}/${project}/_workitems/edit/${query}`;
   } else {
-    // Contains non-digits: run a work-item search scoped to the Saffron area path.
+    // Contains non-digits: run a work-item search scoped to the configured area path.
     // encodeURIComponent makes spaces and special characters URL-safe (space => %20).
     const keywords = encodeURIComponent(query);
-    url = `https://dev.azure.com/${ORG}/${PROJECT}/_search?text=${keywords}&type=workitem&lp=workitems-Team&filters=Projects%7B${PROJECT}%7DArea%20Paths%7B${PROJECT}%5C${encodeURIComponent(AREA_PATH)}%7D&pageSize=25`;
+    url = `https://dev.azure.com/${org}/${project}/_search?text=${keywords}&type=workitem&lp=workitems-Team&filters=Projects%7B${project}%7DArea%20Paths%7B${project}%5C${area}%7D&pageSize=25`;
   }
   openUrl(url);
 }
@@ -64,14 +76,38 @@ function buildMenuItems(items, container) {
   }
 }
 
-// --- Load everything from links.json (labels/URLs live in data, not code) ---
-fetch("links.json")
-  .then((response) => response.json())
-  .then((data) => {
-    buildButtons(data.links, linksContainer);        // quick-link row (buttons)
-    buildMenuItems(data.bookmarks, bookmarksMenu);   // bookmarks dropdown (links)
-  })
-  .catch((error) => console.error("Could not load links.json:", error));
+// --- Load config + content ---
+// Settings come from chrome.storage (options page), falling back to DEFAULTS.
+// Quick links always come from links.json. Bookmarks come from storage if the
+// options page has been used, otherwise they fall back to links.json.
+async function init() {
+  const stored = await chrome.storage.sync.get(["settings", "bookmarks"]);
+
+  if (stored.settings) {
+    config = {
+      org: stored.settings.org || DEFAULTS.org,
+      project: stored.settings.project || DEFAULTS.project,
+      area: stored.settings.area || DEFAULTS.area,
+    };
+  }
+
+  let fileData = { links: [], bookmarks: [] };
+  try {
+    const response = await fetch("links.json");
+    fileData = await response.json();
+  } catch (error) {
+    console.error("Could not load links.json:", error);
+  }
+
+  buildButtons(fileData.links, linksContainer);   // quick-link row (from file)
+
+  const bookmarks = Array.isArray(stored.bookmarks)
+    ? stored.bookmarks                            // managed via the options page
+    : (fileData.bookmarks || []);                 // fallback: bundled defaults
+  buildMenuItems(bookmarks, bookmarksMenu);
+}
+
+init();
 
 // --- Bookmarks dropdown open/close ---
 bookmarksToggle.addEventListener("click", () => {
