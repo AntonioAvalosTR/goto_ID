@@ -14,6 +14,7 @@ const button = document.getElementById("go");
 const linksContainer = document.getElementById("links");
 const bookmarksToggle = document.getElementById("bookmarksToggle");
 const bookmarksMenu = document.getElementById("bookmarksMenu");
+const openOptionsButton = document.getElementById("openOptions");
 
 // --- Open a URL in a new tab and close the popup ---
 function openUrl(url) {
@@ -47,6 +48,11 @@ function go() {
 button.addEventListener("click", go);
 input.addEventListener("keydown", (e) => {
   if (e.key === "Enter") go();              // type/paste + Enter, no mouse
+});
+
+// --- Header cog: open the extension's Settings (options) page ---
+openOptionsButton.addEventListener("click", () => {
+  chrome.runtime.openOptionsPage();
 });
 
 // --- Quick-link ROW: render each entry as a button ---

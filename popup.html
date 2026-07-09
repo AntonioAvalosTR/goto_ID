@@ -6,6 +6,14 @@
         <title>Go to ID</title>
         <style>
             body { width: 260px; font-family: sans-serif; padding: 10px; }
+
+            /* Top header: title left, settings cog right */
+            .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+            .header .title { font-size: 15px; font-weight: 600; }
+            .icon-button { background: none; border: none; padding: 4px; border-radius: 4px; color: #555; cursor: pointer; display: flex; align-items: center; }
+            .icon-button:hover { color: #000; background: #f2f2f2; }
+            .icon-button svg { width: 16px; height: 16px; display: block; }
+
             .row { display: flex; gap: 8px; align-items: stretch; }
             input { flex: 1; min-width: 0; box-sizing: border-box; padding: 6px; font-size: 14px; }
             button { flex-shrink: 0; padding: 6px 10px; cursor: pointer; }
@@ -43,6 +51,15 @@
         </style>
     </head>
     <body>
+        <header class="header">
+            <span class="title">Go to ID</span>
+            <button id="openOptions" class="icon-button" title="Settings" aria-label="Open settings">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+            </button>
+        </header>
         <div class="row">
             <input id="wid" type="text" placeholder="ID or search text" autofocus>
             <button id="go">Go to ID</button>
