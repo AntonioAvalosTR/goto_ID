@@ -2,7 +2,7 @@
 
 A tiny local Chrome extension for Azure DevOps. Type a work item **ID** to jump straight to it, or type **any text** to run a scoped work-item **search** — plus one-click quick links and a bookmarks dropdown for the places you visit most.
 
-**New in v3:** a **Settings page** lets you customize the org, project, area path, and bookmarks without touching any code.
+**New in v3:** a **Settings page** lets you customize everything without touching code — the Azure DevOps target (org / project / area path), the quick-link buttons, and the bookmarks. Each section has a **Reset to default** button, and a **cog icon** in the popup header opens Settings in one click.
 
 ---
 
@@ -33,7 +33,7 @@ That's it. To get updates later, `git pull` and then click the **reload** icon (
 
 ## Use
 
-1. Click the toolbar button.
+1. Click the toolbar button. The popup header shows the title and a **cog** (opens Settings).
 2. Type or paste into the box:
    - **A work item ID** (all digits) → opens that work item directly.
    - **Any text** (a word or phrase with letters) → opens a scoped ADO work-item search for those terms, limited to your configured area path. Spaces and special characters are encoded automatically, so searching `apply borderRadius` just works.
@@ -41,28 +41,26 @@ That's it. To get updates later, `git pull` and then click the **reload** icon (
 
 The result opens in a new tab and the popup closes.
 
-Below the input are two quick buttons — **Current Sprint** (the current sprint backlog) and **Sprint Progress** (the progress-charts query) — plus any others defined in `links.json`. At the bottom, a **Bookmarks** dropdown links to your saved places.
+Below the input is a row of **quick-link buttons**, and at the bottom a **Bookmarks** dropdown. Both are fully editable in Settings.
 
 ---
 
 ## Customizing it (Settings)
 
-Everything you'd previously edit in code now lives on a **Settings page**.
+All customization lives on the **Settings page**.
 
-**To open it:** right-click the toolbar icon → **Options** (or go to `chrome://extensions`, open the extension's **Details**, and click **Extension options**). It opens in a full tab.
+**To open it:** click the **cog** in the popup header, or right-click the toolbar icon → **Options**, or open the extension's **Details** in `chrome://extensions` and click **Extension options**. It opens in a full tab.
 
-**Azure DevOps target** — set the three values that build every URL:
-- **Organization** — e.g. `tr-design`.
-- **Project** — plain text, e.g. `Design Organization`. Do **not** URL-encode it; the extension does that for you.
-- **Area path** — the path *below* the project used to scope searches, e.g. `designOrg\Saffron Design System`. Don't include the project name, and **mind the casing** (lowercase `designOrg`).
+The page has three sections, each with its own **Reset to default** button that restores that section's original setup:
 
-Click **Save settings**. Reopen the popup to use the new target.
+- **Azure DevOps target** — the three values that build every URL:
+  - **Organization** — e.g. `tr-design`.
+  - **Project** — plain text, e.g. `Design Organization`. Do **not** URL-encode it; the extension does that for you.
+  - **Area path** — the path *below* the project used to scope searches, e.g. `designOrg\Saffron Design System`. Don't include the project name, and **mind the casing** (lowercase `designOrg`). Click **Save settings** when done.
+- **Quick links** — add and remove the buttons shown under the input in the popup. Provide a label and an `http(s)` URL and click **Add**; the **newest appears first**. Each has a **Remove** button.
+- **Bookmarks** — same editing, for the entries in the popup's Bookmarks dropdown.
 
-**Bookmarks** — add and remove the entries that appear in the popup's Bookmarks dropdown. Provide a label and an `http(s)` URL and click **Add**; the **newest one appears at the top**. Each has a **Remove** button. The list is seeded from `links.json` the first time you open Settings, so your existing bookmarks are already there.
-
-Settings are stored in your browser (via Chrome's `storage`), so they follow you across your signed-in Chrome instances. Nothing is sent anywhere.
-
-> **Not managed in Settings:** the two quick-link buttons (Current Sprint / Sprint Progress) still live in `links.json` — see below.
+Both lists are seeded from `links.json` the first time you open Settings, so your existing links and bookmarks are already there. Settings are stored in your browser (via Chrome's `storage`), so they follow you across your signed-in Chrome instances. Nothing is sent anywhere.
 
 ---
 
@@ -71,27 +69,23 @@ Settings are stored in your browser (via Chrome's `storage`), so they follow you
 | File | What it does |
 | --- | --- |
 | `manifest.json` | Extension config — name, version, icons, the `storage` permission, and the Settings page registration. |
-| `popup.html` | The popup UI: the input + button, the quick-link row, and the bookmarks dropdown. |
-| `popup.js` | Builds the URL from the input (digits → work item, text → scoped search) and opens it; renders the quick-link buttons and bookmarks. Reads the target and bookmarks from Settings, with fallbacks. |
-| `options.html` | The Settings page UI. |
-| `options.js` | Loads/saves the org/project/area path and the bookmarks list. |
-| `links.json` | The quick-link buttons (`links`) and the **default** bookmarks (`bookmarks`) used to seed Settings on first use. |
-| `icon16 / 32 / 48 / 128 .png` | Toolbar and extensions-page icons at each size Chrome asks for. |
-| `Browser-Extensions.md` | A short explainer on how browser extensions work and their limits. Read this for building your own tools with the help of AI chats. |
+| `popup.html` | The popup UI: the header (title + cog), the input + button, the quick-link row, and the bookmarks dropdown. |
+| `popup.js` | Builds the URL from the input (digits → work item, text → scoped search) and opens it; renders the quick links and bookmarks. Reads the target, quick links, and bookmarks from Settings, with fallbacks. |
+| `options.html` | The Settings page UI (target + the two editable lists, each with a reset button). |
+| `options.js` | Loads/saves the target and both lists; one shared list manager powers Quick links and Bookmarks. |
+| `links.json` | The **default** quick links (`links`) and bookmarks (`bookmarks`) — used to seed Settings on first use and to restore on reset. |
+| `img/` | The toolbar/extension icons (16/32/48/128). |
+| `docs/Browser-Extensions.md` | A short explainer on how browser extensions work and their limits. Read this for building your own tools with the help of AI chats. |
 
 ---
 
 ## Notes & tweaks
 
-- **Changing org / project / area path — use the Settings page**, not the code. Plain text, no URL-encoding; casing matters for the area path.
+- **Change anything via the Settings page**, not the code — the ADO target, the quick-link buttons, and the bookmarks are all editable there. Each section has a **Reset to default** to undo your changes and restore the original setup.
 
-- **The constants at the top of `popup.js` are now just fallback defaults.** They're only used if Settings has never been saved. Editing them changes the defaults, not the live behavior once you've saved settings — so day-to-day customization belongs in Settings.
+- **Quick links and bookmarks share one source of truth.** Both are managed in Settings and stored in the browser. `links.json` provides the initial seed the first time Settings is opened, and the defaults that **Reset to default** restores. Day-to-day, edit them in Settings; edit `links.json` only if you want to change the defaults themselves.
 
-- **Quick links vs. bookmarks — two different sources.**
-  - The **quick-link row** (Current Sprint, Sprint Progress, …) is read from `links.json` (`links`). Edit that file to change those buttons.
-  - **Bookmarks** are managed in **Settings** and stored in the browser. `links.json` (`bookmarks`) only provides the initial seed the first time Settings is opened; after that, the saved copy is the source of truth.
-
-- **Resetting to defaults:** remove and re-add the extension (which clears its stored settings and bookmarks), then reopen Settings to re-seed from `links.json`. *(A "Restore defaults" button could be added to Settings if that becomes a common need.)*
+- **The constants at the top of `popup.js` (and `options.js`) are fallback defaults** for the ADO target — used only until you save settings. Editing them changes the defaults, not the live behavior once you've saved.
 
 - **Open in a window instead of a tab:** in `popup.js`, swap `chrome.tabs.create({ url })` for `chrome.windows.create({ url })` inside the `openUrl` helper.
 

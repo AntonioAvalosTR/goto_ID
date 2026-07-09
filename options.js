@@ -9,24 +9,36 @@ const orgInput = document.getElementById("org");
 const projectInput = document.getElementById("project");
 const areaInput = document.getElementById("area");
 const saveButton = document.getElementById("save");
+const resetSettingsButton = document.getElementById("resetSettings");
 const settingsStatus = document.getElementById("settingsStatus");
 
 // --- Settings ---
+function flashStatus(text) {
+  settingsStatus.textContent = text;
+  settingsStatus.hidden = false;
+  setTimeout(() => (settingsStatus.hidden = true), 1500);
+}
+
 saveButton.addEventListener("click", () => {
   const settings = {
     org: orgInput.value.trim(),
     project: projectInput.value.trim(),
     area: areaInput.value.trim(),
   };
-  chrome.storage.sync.set({ settings }, () => {
-    settingsStatus.hidden = false;
-    setTimeout(() => (settingsStatus.hidden = true), 1500);
-  });
+  chrome.storage.sync.set({ settings }, () => flashStatus("Saved"));
+});
+
+resetSettingsButton.addEventListener("click", () => {
+  if (!confirm("Reset the Azure DevOps target to the original defaults?")) return;
+  orgInput.value = DEFAULTS.org;
+  projectInput.value = DEFAULTS.project;
+  areaInput.value = DEFAULTS.area;
+  chrome.storage.sync.set({ settings: { ...DEFAULTS } }, () => flashStatus("Reset to default"));
 });
 
 // --- Reusable editable list (drives both Quick links and Bookmarks) ---
-// storageKey doubles as the key inside links.json used to seed on first run.
-function createEditableList({ storageKey, listEl, labelInput, urlInput, addButton, errorEl }) {
+// storageKey doubles as the key inside links.json used to seed / reset.
+function createEditableList({ storageKey, listEl, labelInput, urlInput, addButton, errorEl, resetButton }) {
   let items = [];
 
   function persist() {
@@ -89,6 +101,13 @@ function createEditableList({ storageKey, listEl, labelInput, urlInput, addButto
     render();
   });
 
+  resetButton.addEventListener("click", async () => {
+    if (!confirm("Reset this list to the original defaults? Your customizations will be removed.")) return;
+    items = await seedFromFile(storageKey);
+    persist();
+    render();
+  });
+
   // Use stored items, or seed from links.json on first run.
   async function initFrom(storedItems) {
     if (Array.isArray(storedItems)) {
@@ -121,6 +140,7 @@ const quickLinks = createEditableList({
   urlInput: document.getElementById("newLinkUrl"),
   addButton: document.getElementById("addLink"),
   errorEl: document.getElementById("addLinkError"),
+  resetButton: document.getElementById("resetLinks"),
 });
 
 const bookmarks = createEditableList({
@@ -130,6 +150,7 @@ const bookmarks = createEditableList({
   urlInput: document.getElementById("newUrl"),
   addButton: document.getElementById("add"),
   errorEl: document.getElementById("addError"),
+  resetButton: document.getElementById("resetBookmarks"),
 });
 
 // --- Load everything when the page opens ---

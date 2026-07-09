@@ -15,6 +15,7 @@ const linksContainer = document.getElementById("links");
 const bookmarksToggle = document.getElementById("bookmarksToggle");
 const bookmarksMenu = document.getElementById("bookmarksMenu");
 const openOptionsButton = document.getElementById("openOptions");
+const bookmarksSection = document.querySelector(".bookmarks");
 
 // --- Open a URL in a new tab and close the popup ---
 function openUrl(url) {
@@ -112,7 +113,11 @@ async function init() {
   const bookmarks = Array.isArray(stored.bookmarks)
     ? stored.bookmarks                            // managed via the options page
     : (fileData.bookmarks || []);                 // fallback: bundled defaults
-  buildMenuItems(bookmarks, bookmarksMenu);
+  if (bookmarks.length > 0) {
+    buildMenuItems(bookmarks, bookmarksMenu);
+  } else {
+    bookmarksSection.hidden = true;               // no bookmarks => hide the dropdown entirely
+  }
 }
 
 init();
