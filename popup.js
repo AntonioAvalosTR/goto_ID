@@ -1,5 +1,6 @@
-const ORG = "tr-design";   // <-- change this
-const PROJECT = "Design%20Organization";    // <-- change this
+const ORG = "tr-design";
+const PROJECT = "Design%20Organization";   // already URL-encoded (contains a space)
+const AREA_PATH = "designOrg\\Saffron Design System";  // not URL-encoded (contains a space)
 
 const input = document.getElementById("wid");
 const button = document.getElementById("go");
@@ -7,28 +8,34 @@ const linksContainer = document.getElementById("links");
 const bookmarksToggle = document.getElementById("bookmarksToggle");
 const bookmarksMenu = document.getElementById("bookmarksMenu");
 
-// --- Go to ID: build a work-item URL from the typed number ---
-function goToId() {
-  const id = input.value.trim();
-  if (!/^\d+$/.test(id)) return;            // only proceed if it's all digits
-  const url = `https://dev.azure.com/${ORG}/${PROJECT}/_workitems/edit/${id}`;
-  chrome.tabs.create({ url });
-  window.close();
-}
-
-button.addEventListener("click", goToId);
-input.addEventListener("input", () => {
-  input.value = input.value.replace(/[^0-9]/g, "");   // strip non-digits as typed
-});
-input.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") goToId();          // paste + Enter, no mouse
-});
-
 // --- Open a URL in a new tab and close the popup ---
 function openUrl(url) {
   chrome.tabs.create({ url });
   window.close();
 }
+
+// --- Submit: all digits => open that work item; any text => ADO search ---
+function go() {
+  const query = input.value.trim();
+  if (!query) return;                       // nothing entered, do nothing
+
+  let url;
+  if (/^\d+$/.test(query)) {
+    // Pure number: treat as a work item ID and open it directly
+    url = `https://dev.azure.com/${ORG}/${PROJECT}/_workitems/edit/${query}`;
+  } else {
+    // Contains non-digits: run a work-item search scoped to the Saffron area path.
+    // encodeURIComponent makes spaces and special characters URL-safe (space => %20).
+    const keywords = encodeURIComponent(query);
+    url = `https://dev.azure.com/${ORG}/${PROJECT}/_search?text=${keywords}&type=workitem&lp=workitems-Team&filters=Projects%7B${PROJECT}%7DArea%20Paths%7B${PROJECT}%5C${encodeURIComponent(AREA_PATH)}%7D&pageSize=25`;
+  }
+  openUrl(url);
+}
+
+button.addEventListener("click", go);
+input.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") go();              // type/paste + Enter, no mouse
+});
 
 // --- Quick-link ROW: render each entry as a button ---
 function buildButtons(items, container) {
