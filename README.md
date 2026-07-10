@@ -4,6 +4,8 @@ A tiny local Chrome extension for Azure DevOps. Type a work item **ID** to jump 
 
 **New in v3:** a **Settings page** lets you customize everything without touching code — the Azure DevOps target (org / project / area path), the quick-link buttons, and the bookmarks. Each section has a **Reset to default** button, a **cog icon** in the popup header opens Settings, and a keyboard shortcut (**Ctrl+Shift+G**) opens the popup from anywhere.
 
+**New in v3.1:** a **clipboard button** in the popup header copies a clean, shareable link to the work item on the current Azure DevOps page — turning ADO's messy URLs into your standard `…/_workitems/edit/<id>` format.
+
 ---
 
 ## Why
@@ -43,6 +45,10 @@ The result opens in a new tab and the popup closes.
 
 Below the input is a row of **quick-link buttons**, and at the bottom a **Bookmarks** dropdown. Both are fully editable in Settings.
 
+**Copy a shareable link.** On any Azure DevOps page that's showing a work item, click the **clipboard icon** in the header. It finds the work item ID in the page's URL — whether that's `?workitem=<id>`, `_workitems/edit/<id>`, or a query view (`_queries/edit/<id>`) — and copies a link in your standard `…/_workitems/edit/<id>` format. It pastes as a **titled link** (using the work item's title from the browser tab) in rich-text apps like email, Teams, or Word, and as the clean URL in plain-text targets. If it can't find an ID it says so — click the work item's ID link on the page first, then try again.
+
+> **Known issue (ADO behavior, not the tool):** On backlog and board views the URL carries `&workitem=<id>`, but ADO keeps the browser tab title on the backlog/board page rather than the item. Since the link's title comes from the tab, the copied link falls back to "Work item `<id>`" there. Open the item on its own page for the full titled link.
+
 ---
 
 ## Customizing it (Settings)
@@ -75,7 +81,7 @@ The popup and Settings page are built to work with the keyboard and with screen 
 
 **Screen readers**
 - Every control has a name — the ID/search box, the Settings fields, and the icon-only buttons (search, cog) all announce their purpose, and each **Remove** button names the item it removes (e.g. "Remove Wiki").
-- Saving, resetting, and validation errors are announced automatically (they're live regions), so you get spoken confirmation or an error without hunting for it.
+- Saving, resetting, validation errors, and the copy-link result are announced automatically (they're live regions), so you get spoken confirmation or an error without hunting for it.
 - The popup title is a heading and the Quick links / Bookmarks are real lists, so you can navigate by heading and hear item counts.
 - Each Settings field's helper text (e.g. "don't URL-encode", "mind the casing") is read out when the field is focused.
 
@@ -85,8 +91,8 @@ The popup and Settings page are built to work with the keyboard and with screen 
 
 | File | What it does |
 | --- | --- |
-| `manifest.json` | Extension config — name, version, icons, the `storage` permission, and the Settings page registration. |
-| `popup.html` | The popup UI: the header (title + cog), the input + search button, the quick-link row, and the bookmarks dropdown. |
+| `manifest.json` | Extension config — name, version, icons, the `storage` + `activeTab` permissions, and the Settings page registration. |
+| `popup.html` | The popup UI: the header (title + copy-link + cog), the input + search button, the quick-link row, and the bookmarks dropdown. |
 | `popup.js` | Builds the URL from the input (digits → work item, text → scoped search) and opens it; renders the quick links and bookmarks. Reads the target, quick links, and bookmarks from Settings, with fallbacks. |
 | `options.html` | The Settings page UI (target + the two editable lists, each with a reset button). |
 | `options.js` | Loads/saves the target and both lists; one shared list manager powers Quick links and Bookmarks. |
@@ -108,6 +114,8 @@ The popup and Settings page are built to work with the keyboard and with screen 
 - **Open in a window instead of a tab:** in `popup.js`, swap `chrome.tabs.create({ url })` for `chrome.windows.create({ url })` inside the `openUrl` helper.
 
 - **The `storage` permission** (added in v3) is what lets the extension remember your Settings. It only stores your own configuration; it doesn't read pages, history, or anything else.
+
+- **The `activeTab` permission** (added in v3.1) lets the copy-link button read the URL of the tab you're on — only that tab, and only at the moment you click the button. It can't see your other tabs, your history, or page contents.
 
 - **Keyboard shortcut.** **Ctrl+Shift+G** (**⌘+Shift+G** on Mac) opens the popup from any tab. Change or clear it at `chrome://extensions/shortcuts`. If it doesn't fire right after loading, set it there once — Chrome applies suggested shortcuts at install time and won't always override an existing binding.
 

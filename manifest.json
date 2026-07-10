@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
   "name": "Go to ID",
-  "version": "3.0",
-  "description": "Type a work item ID to open it directly, or any text to search Azure DevOps. Plus quick links and bookmarks.",
-  "permissions": ["storage"],
+  "version": "3.1",
+  "description": "Type a work item ID to open it directly, or any text to search Azure DevOps. Plus quick links, bookmarks, and copy-a-shareable-link.",
+  "permissions": ["storage", "activeTab"],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
