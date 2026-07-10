@@ -103,3 +103,16 @@ label { display: block; font-size: 13px; font-weight: 600; margin: 12px 0 4px; }
 /* Secondary "Reset to default" button */
 .reset-btn { display: block; margin-top: 12px; background: #fff; border: 1px solid #ccc; color: #555; border-radius: 4px; }
 .reset-btn:hover { background: #f2f2f2; color: #000; }
+
+/* Checkbox rows (History enable + the Show-in-popup toggles) */
+.checkbox-row { display: flex; align-items: center; gap: 8px; font-weight: 400; margin: 12px 0 4px; cursor: pointer; }
+.checkbox-row input { margin: 0; }
+
+/* Small number field for the History item count */
+.num-input { width: 90px; padding: 6px 8px; }
+.num-input:disabled { opacity: 0.5; }
+
+/* Footer row under a list: Reset button + Show-in-popup toggle + status */
+.section-footer { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 12px; }
+.section-footer .reset-btn { margin-top: 0; }
+.section-footer .checkbox-row { margin: 0; }

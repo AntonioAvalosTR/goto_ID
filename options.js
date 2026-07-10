@@ -5,17 +5,37 @@ const DEFAULTS = {
   area: "designOrg\\Saffron Design System",
 };
 
+// Popup preferences (History on/off + count, and which sections show).
+// Mirrors PREF_DEFAULTS in popup.js. Kept in memory so each control writes the whole object.
+const PREF_DEFAULTS = { historyEnabled: true, historyMax: 6, showLinks: true, showBookmarks: true };
+let prefs = { ...PREF_DEFAULTS };
+
+// Keep the item count within sane bounds (1–20), else fall back to the default.
+function clampMax(n) {
+  const v = parseInt(n, 10);
+  if (Number.isNaN(v)) return PREF_DEFAULTS.historyMax;
+  return Math.min(20, Math.max(1, v));
+}
+
 const orgInput = document.getElementById("org");
 const projectInput = document.getElementById("project");
 const areaInput = document.getElementById("area");
 const saveButton = document.getElementById("save");
 const resetSettingsButton = document.getElementById("resetSettings");
 const settingsStatus = document.getElementById("settingsStatus");
+const historyEnabledInput = document.getElementById("historyEnabled");
+const historyMaxInput = document.getElementById("historyMax");
+const saveHistoryButton = document.getElementById("saveHistory");
+const historyStatus = document.getElementById("historyStatus");
+const showLinksInput = document.getElementById("showLinks");
+const showBookmarksInput = document.getElementById("showBookmarks");
+const linksVisStatus = document.getElementById("linksVisStatus");
+const bookmarksVisStatus = document.getElementById("bookmarksVisStatus");
 
 // --- Settings ---
-function flashStatus(text) {
-  settingsStatus.textContent = text;                 // role="status" announces the change
-  setTimeout(() => { settingsStatus.textContent = ""; }, 1500);
+function flashStatus(el, text) {
+  el.textContent = text;                             // role="status" announces the change
+  setTimeout(() => { el.textContent = ""; }, 1500);
 }
 
 saveButton.addEventListener("click", () => {
@@ -24,7 +44,7 @@ saveButton.addEventListener("click", () => {
     project: projectInput.value.trim(),
     area: areaInput.value.trim(),
   };
-  chrome.storage.sync.set({ settings }, () => flashStatus("Saved"));
+  chrome.storage.sync.set({ settings }, () => flashStatus(settingsStatus, "Saved"));
 });
 
 resetSettingsButton.addEventListener("click", () => {
@@ -32,7 +52,41 @@ resetSettingsButton.addEventListener("click", () => {
   orgInput.value = DEFAULTS.org;
   projectInput.value = DEFAULTS.project;
   areaInput.value = DEFAULTS.area;
-  chrome.storage.sync.set({ settings: { ...DEFAULTS } }, () => flashStatus("Reset to default"));
+  chrome.storage.sync.set({ settings: { ...DEFAULTS } }, () => flashStatus(settingsStatus, "Reset to default"));
+});
+
+// --- Popup preferences (History + section visibility) ---
+function persistPrefs(cb) {
+  chrome.storage.sync.set({ prefs }, cb || (() => {}));
+}
+
+// The count field is only relevant when History is on — grey it out (and drop it from
+// the tab order) while unchecked. This is a live UI cue; it persists on Save.
+historyEnabledInput.addEventListener("change", () => {
+  historyMaxInput.disabled = !historyEnabledInput.checked;
+});
+
+// History enable + count save together (the count is a typed value, like the target).
+saveHistoryButton.addEventListener("click", () => {
+  prefs.historyEnabled = historyEnabledInput.checked;
+  prefs.historyMax = clampMax(historyMaxInput.value);
+  historyMaxInput.value = prefs.historyMax;               // reflect the clamped value
+  // Trim any stored history to the new count so the popup reflects it right away.
+  chrome.storage.sync.get(["history"], (d) => {
+    const history = Array.isArray(d.history) ? d.history.slice(0, prefs.historyMax) : [];
+    chrome.storage.sync.set({ prefs, history }, () => flashStatus(historyStatus, "Saved"));
+  });
+});
+
+// Section visibility toggles save immediately (single switches, no typing).
+showLinksInput.addEventListener("change", () => {
+  prefs.showLinks = showLinksInput.checked;
+  persistPrefs(() => flashStatus(linksVisStatus, showLinksInput.checked ? "Shown in popup" : "Hidden from popup"));
+});
+
+showBookmarksInput.addEventListener("change", () => {
+  prefs.showBookmarks = showBookmarksInput.checked;
+  persistPrefs(() => flashStatus(bookmarksVisStatus, showBookmarksInput.checked ? "Shown in popup" : "Hidden from popup"));
 });
 
 // --- Reusable editable list (drives both Quick links and Bookmarks) ---
@@ -155,11 +209,23 @@ const bookmarks = createEditableList({
 
 // --- Load everything when the page opens ---
 function load() {
-  chrome.storage.sync.get(["settings", "links", "bookmarks"], (data) => {
+  chrome.storage.sync.get(["settings", "links", "bookmarks", "prefs"], (data) => {
     const settings = data.settings || {};
     orgInput.value = settings.org ?? DEFAULTS.org;
     projectInput.value = settings.project ?? DEFAULTS.project;
     areaInput.value = settings.area ?? DEFAULTS.area;
+
+    prefs = {
+      historyEnabled: data.prefs?.historyEnabled !== false,   // default on
+      historyMax: clampMax(data.prefs?.historyMax),
+      showLinks: data.prefs?.showLinks !== false,             // default on
+      showBookmarks: data.prefs?.showBookmarks !== false,     // default on
+    };
+    historyEnabledInput.checked = prefs.historyEnabled;
+    historyMaxInput.value = prefs.historyMax;
+    historyMaxInput.disabled = !prefs.historyEnabled;
+    showLinksInput.checked = prefs.showLinks;
+    showBookmarksInput.checked = prefs.showBookmarks;
 
     quickLinks.initFrom(data.links);
     bookmarks.initFrom(data.bookmarks);

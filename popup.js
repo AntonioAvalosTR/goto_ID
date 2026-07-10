@@ -6,9 +6,17 @@ const DEFAULTS = {
   area: "designOrg\\Saffron Design System",
 };
 
-// How many History entries to keep. For now this is a constant so we can test;
-// it's kept as a single variable so it can move to the Settings page later.
-const MAX_HISTORY = 6;
+// Popup preferences (History on/off + item count, and which sections show).
+// Defaults mirror PREF_DEFAULTS in options.js; overridden from chrome.storage on load.
+const PREF_DEFAULTS = { historyEnabled: true, historyMax: 6, showLinks: true, showBookmarks: true };
+let prefs = { ...PREF_DEFAULTS };
+
+// Keep a stored item count within sane bounds (1–20), else fall back to the default.
+function clampMax(n) {
+  const v = parseInt(n, 10);
+  if (Number.isNaN(v)) return PREF_DEFAULTS.historyMax;
+  return Math.min(20, Math.max(1, v));
+}
 
 // Live config, overridden from chrome.storage on load.
 let config = { ...DEFAULTS };
@@ -26,6 +34,7 @@ const historySection = document.querySelector(".history");
 const historyToggle = document.getElementById("historyToggle");
 const historyMenu = document.getElementById("historyMenu");
 const clearHistoryButton = document.getElementById("clearHistory");
+const mainDivider = document.getElementById("mainDivider");
 
 // --- Open a URL in a new tab and close the popup ---
 function openUrl(url) {
@@ -48,15 +57,17 @@ function searchUrl(query) {
 }
 
 // --- History ------------------------------------------------------------
-// Persisted in chrome.storage.sync, de-duped by URL, newest first, capped at
-// MAX_HISTORY. Each entry: { type: "id" | "search" | "copy", label, url }.
+// Persisted in chrome.storage.sync, de-duped by URL, newest first, capped at the
+// configured count. Each entry: { type: "id" | "search" | "copy", label, url }.
 // The full URL is stored at creation time (see the disclaimer on the options page).
+// No-op when History is turned off in Settings.
 async function recordHistory(entry) {
+  if (prefs.historyEnabled === false) return null;
   try {
     const { history = [] } = await chrome.storage.sync.get(["history"]);
     const deduped = history.filter((h) => h.url !== entry.url);   // no duplicates
     deduped.unshift(entry);                                        // newest on top
-    const trimmed = deduped.slice(0, MAX_HISTORY);
+    const trimmed = deduped.slice(0, prefs.historyMax);
     await chrome.storage.sync.set({ history: trimmed });
     return trimmed;
   } catch (e) {
@@ -74,12 +85,14 @@ function tagText(type) {
 
 function renderHistory(items) {
   historyMenu.innerHTML = "";
-  if (!items || items.length === 0) {
+  // Off in Settings => never show; otherwise show the newest up to the configured count.
+  const list = prefs.historyEnabled === false ? [] : (items || []).slice(0, prefs.historyMax);
+  if (list.length === 0) {
     historySection.hidden = true;             // nothing to show => hide the section
     return;
   }
   historySection.hidden = false;
-  for (const item of items) {
+  for (const item of list) {
     const li = document.createElement("li");
     const link = document.createElement("a");
     link.className = "dropdown-item history-item";
@@ -280,13 +293,22 @@ function buildMenuItems(items, container) {
 // Settings, quick links, bookmarks, and history all come from chrome.storage.
 // Each falls back to the bundled defaults (DEFAULTS / links.json) if never customized.
 async function init() {
-  const stored = await chrome.storage.sync.get(["settings", "links", "bookmarks", "history"]);
+  const stored = await chrome.storage.sync.get(["settings", "links", "bookmarks", "history", "prefs"]);
 
   if (stored.settings) {
     config = {
       org: stored.settings.org || DEFAULTS.org,
       project: stored.settings.project || DEFAULTS.project,
       area: stored.settings.area || DEFAULTS.area,
+    };
+  }
+
+  if (stored.prefs) {
+    prefs = {
+      historyEnabled: stored.prefs.historyEnabled !== false,   // default on
+      historyMax: clampMax(stored.prefs.historyMax),
+      showLinks: stored.prefs.showLinks !== false,             // default on
+      showBookmarks: stored.prefs.showBookmarks !== false,     // default on
     };
   }
 
@@ -306,11 +328,15 @@ async function init() {
   const bookmarks = Array.isArray(stored.bookmarks)
     ? stored.bookmarks                            // managed via the options page
     : (fileData.bookmarks || []);                 // fallback: bundled defaults
-  if (bookmarks.length > 0) {
-    buildMenuItems(bookmarks, bookmarksMenu);
-  } else {
-    bookmarksSection.hidden = true;               // no bookmarks => hide the dropdown entirely
-  }
+  buildMenuItems(bookmarks, bookmarksMenu);
+
+  // Section visibility from Settings. Bookmarks also hides when there's nothing in it.
+  // When both the quick-link row and Bookmarks are hidden, hide the divider too.
+  const linksVisible = prefs.showLinks !== false;
+  const bookmarksVisible = prefs.showBookmarks !== false && bookmarks.length > 0;
+  linksContainer.hidden = !linksVisible;
+  bookmarksSection.hidden = !bookmarksVisible;
+  mainDivider.hidden = !(linksVisible || bookmarksVisible);
 
   renderHistory(Array.isArray(stored.history) ? stored.history : []);
 }

@@ -7,7 +7,6 @@
         <link rel="stylesheet" href="styles.css">
     </head>
     <body class="options">
-        <img src="img/icon128.png" alt="" width="64" height="64">
         <h1>Go to ID — Settings</h1>
         <p class="hint">These settings are saved in your browser and used by the popup.</p>
 
@@ -34,6 +33,25 @@
 
         <hr>
 
+        <h2>History</h2>
+        <div class="hint">The recent IDs, searches, and copied pages shown under the input in the popup.</div>
+
+        <label class="checkbox-row">
+            <input id="historyEnabled" type="checkbox">
+            Show History in the popup
+        </label>
+
+        <label for="historyMax">Number of items to keep</label>
+        <input id="historyMax" type="number" min="1" max="20" step="1" class="num-input" aria-describedby="historyMaxHint">
+        <div id="historyMaxHint" class="hint">Between 1 and 20. Newest first; older entries drop off. Default is 6.</div>
+
+        <div class="actions">
+            <button id="saveHistory">Save</button>
+            <span id="historyStatus" class="status" role="status"></span>
+        </div>
+
+        <hr>
+
         <h2>Quick links</h2>
         <div class="hint">The buttons shown under the input in the popup. The newest one is added to the top.</div>
 
@@ -45,7 +63,14 @@
         <div id="addLinkError" class="error" role="alert"></div>
 
         <ul id="linkList" class="list"></ul>
-        <button id="resetLinks" class="reset-btn">Reset to default</button>
+        <div class="section-footer">
+            <button id="resetLinks" class="reset-btn">Reset to default</button>
+            <label class="checkbox-row">
+                <input id="showLinks" type="checkbox">
+                Show in popup
+            </label>
+            <span id="linksVisStatus" class="status" role="status"></span>
+        </div>
 
         <hr>
 
@@ -60,7 +85,14 @@
         <div id="addError" class="error" role="alert"></div>
 
         <ul id="bookmarkList" class="list"></ul>
-        <button id="resetBookmarks" class="reset-btn">Reset to default</button>
+        <div class="section-footer">
+            <button id="resetBookmarks" class="reset-btn">Reset to default</button>
+            <label class="checkbox-row">
+                <input id="showBookmarks" type="checkbox">
+                Show in popup
+            </label>
+            <span id="bookmarksVisStatus" class="status" role="status"></span>
+        </div>
 
         <script src="options.js"></script>
     </body>
