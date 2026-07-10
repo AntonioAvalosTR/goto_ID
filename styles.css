@@ -16,9 +16,11 @@ hr { border: none; border-top: 1px solid #ddd; }
 body.popup { width: 260px; padding: 10px; }
 body.popup hr { margin: 10px 0; }
 
-/* Top header: title left, settings cog right */
+/* Top header: brand (icon + title) left, settings cog right */
 .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-.header .title { font-size: 15px; font-weight: 600; }
+.brand { display: flex; align-items: center; gap: 8px; }
+.brand-icon { width: 18px; height: 18px; display: block; }
+.header .title { font-size: 15px; font-weight: 600; margin: 0; }
 .icon-button { background: none; border: none; padding: 4px; border-radius: 4px; color: #555; display: flex; align-items: center; }
 .icon-button:hover { color: #000; background: #f2f2f2; }
 .icon-button svg { width: 16px; height: 16px; display: block; }
@@ -78,6 +80,7 @@ label { display: block; font-size: 13px; font-weight: 600; margin: 12px 0 4px; }
 .add-row input { flex: 1 1 0; min-width: 0; }
 
 /* Shared editable-list styling (Quick links + Bookmarks) */
+.list { list-style: none; margin: 0; padding: 0; }
 .list-item { display: flex; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee; }
 .list-item .meta { flex: 1; min-width: 0; }
 .list-item .label { font-size: 14px; font-weight: 600; }

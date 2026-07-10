@@ -127,4 +127,17 @@ bookmarksToggle.addEventListener("click", () => {
   const opening = bookmarksMenu.hidden;              // hidden now => we're opening it
   bookmarksMenu.hidden = !opening;
   bookmarksToggle.setAttribute("aria-expanded", String(opening));
+  if (opening) {
+    const firstItem = bookmarksMenu.querySelector(".dropdown-item");
+    if (firstItem) firstItem.focus();                // move focus into the menu
+  }
+});
+
+// Escape closes the dropdown and returns focus to the toggle
+bookmarksSection.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && !bookmarksMenu.hidden) {
+    bookmarksMenu.hidden = true;
+    bookmarksToggle.setAttribute("aria-expanded", "false");
+    bookmarksToggle.focus();
+  }
 });

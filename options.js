@@ -47,14 +47,14 @@ function createEditableList({ storageKey, listEl, labelInput, urlInput, addButto
   function render() {
     listEl.innerHTML = "";
     if (items.length === 0) {
-      const empty = document.createElement("p");
+      const empty = document.createElement("li");
       empty.className = "hint";
       empty.textContent = "Nothing here yet. Add one above.";
       listEl.appendChild(empty);
       return;
     }
     items.forEach((item, index) => {
-      const row = document.createElement("div");
+      const row = document.createElement("li");
       row.className = "list-item";
 
       const meta = document.createElement("div");

@@ -64,6 +64,23 @@ Both lists are seeded from `links.json` the first time you open Settings, so you
 
 ---
 
+## Accessibility
+
+The popup and Settings page are built to work with the keyboard and with screen readers.
+
+**Keyboard**
+- Open the popup from any tab with **Ctrl+Shift+G** (**⌘+Shift+G** on Mac); the input is focused automatically.
+- **Tab** / **Shift+Tab** move between controls; **Enter** runs the ID/search box and activates buttons and links.
+- In the **Bookmarks** dropdown, opening it moves focus to the first item, **Tab** cycles through the rest, and **Esc** closes it and returns focus to the Bookmarks button. The focused item shows a clear outline.
+
+**Screen readers**
+- Every control has a name — the ID/search box, the Settings fields, and the icon-only buttons (search, cog) all announce their purpose, and each **Remove** button names the item it removes (e.g. "Remove Wiki").
+- Saving, resetting, and validation errors are announced automatically (they're live regions), so you get spoken confirmation or an error without hunting for it.
+- The popup title is a heading and the Quick links / Bookmarks are real lists, so you can navigate by heading and hear item counts.
+- Each Settings field's helper text (e.g. "don't URL-encode", "mind the casing") is read out when the field is focused.
+
+---
+
 ## What's in here
 
 | File | What it does |
