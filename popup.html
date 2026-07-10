@@ -4,53 +4,9 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Go to ID</title>
-        <style>
-            body { width: 260px; font-family: sans-serif; padding: 10px; }
-
-            /* Top header: title left, settings cog right */
-            .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-            .header .title { font-size: 15px; font-weight: 600; }
-            .icon-button { background: none; border: none; padding: 4px; border-radius: 4px; color: #555; cursor: pointer; display: flex; align-items: center; }
-            .icon-button:hover { color: #000; background: #f2f2f2; }
-            .icon-button svg { width: 16px; height: 16px; display: block; }
-
-            .row { display: flex; gap: 8px; align-items: stretch; }
-            input { flex: 1; min-width: 0; box-sizing: border-box; padding: 6px; font-size: 14px; }
-            button { flex-shrink: 0; padding: 6px 10px; cursor: pointer; }
-            hr { border: none; border-top: 1px solid #ddd; margin: 10px 0; }
-            .links { display: flex; flex-wrap: wrap; gap: 8px; }
-            .links button { flex: 1 1 45%; }
-
-            /* Bookmarks dropdown (Bootstrap-like, no dependency) */
-            .bookmarks { position: relative; margin-top: 8px; }
-            .dropdown-toggle { width: 100%; display: flex; justify-content: space-between; align-items: center; }
-            .caret { transition: transform 0.15s ease; }
-            .dropdown-toggle[aria-expanded="true"] .caret { transform: rotate(180deg); }
-
-            .dropdown-menu {
-                margin-top: 4px;
-                padding: 6px 0;
-                background: #fff;
-                border: 1px solid rgba(0, 0, 0, 0.15);
-                border-radius: 6px;
-                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
-            }
-            .dropdown-menu[hidden] { display: none; }
-
-            .dropdown-item {
-                display: block;
-                padding: 6px 14px;
-                color: #212529;
-                font-size: 14px;
-                text-decoration: none;
-                white-space: nowrap;
-                cursor: pointer;
-            }
-            .dropdown-item:hover,
-            .dropdown-item:focus { background: #f2f2f2; outline: none; }
-        </style>
+        <link rel="stylesheet" href="styles.css">
     </head>
-    <body>
+    <body class="popup">
         <header class="header">
             <span class="title">Go to ID</span>
             <button id="openOptions" class="icon-button" title="Settings" aria-label="Open settings">
@@ -62,7 +18,12 @@
         </header>
         <div class="row">
             <input id="wid" type="text" placeholder="ID or search text" autofocus>
-            <button id="go">Go to ID</button>
+            <button id="go" title="Search or open by ID" aria-label="Search or open by ID">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+            </button>
         </div>
         <hr>
         <div id="links" class="links"></div>

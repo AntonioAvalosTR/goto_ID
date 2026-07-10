@@ -1,0 +1,89 @@
+/* ============================================================
+   Go to ID — shared styles for popup.html and options.html
+   Page-specific rules are scoped under body.popup / body.options
+   so the shared sheet doesn't bleed between the two pages.
+   ============================================================ */
+
+/* ---------- Shared base ---------- */
+body { font-family: sans-serif; color: #212529; }
+button { cursor: pointer; font-size: 14px; padding: 6px 12px; flex-shrink: 0; }
+input { box-sizing: border-box; font-size: 14px; }
+hr { border: none; border-top: 1px solid #ddd; }
+
+/* ============================================================
+   Popup (popup.html)
+   ============================================================ */
+body.popup { width: 260px; padding: 10px; }
+body.popup hr { margin: 10px 0; }
+
+/* Top header: title left, settings cog right */
+.header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.header .title { font-size: 15px; font-weight: 600; }
+.icon-button { background: none; border: none; padding: 4px; border-radius: 4px; color: #555; display: flex; align-items: center; }
+.icon-button:hover { color: #000; background: #f2f2f2; }
+.icon-button svg { width: 16px; height: 16px; display: block; }
+
+/* Input + primary action row */
+.row { display: flex; gap: 8px; align-items: stretch; }
+.row input { flex: 1; min-width: 0; padding: 6px; }
+#go { display: flex; align-items: center; justify-content: center; }
+#go svg { width: 16px; height: 16px; display: block; }
+
+/* Quick-link buttons */
+.links { display: flex; flex-wrap: wrap; gap: 8px; }
+.links button { flex: 1 1 45%; }
+
+/* Bookmarks dropdown (Bootstrap-like, no dependency) */
+.bookmarks { position: relative; margin-top: 8px; }
+.dropdown-toggle { width: 100%; display: flex; justify-content: space-between; align-items: center; }
+.caret { font-size: 1.3em; line-height: 1; transition: transform 0.15s ease; }
+.dropdown-toggle[aria-expanded="true"] .caret { transform: rotate(180deg); }
+.dropdown-menu {
+    margin-top: 4px;
+    padding: 6px 0;
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 6px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
+}
+.dropdown-menu[hidden] { display: none; }
+.dropdown-item {
+    display: block;
+    padding: 6px 14px;
+    color: #212529;
+    font-size: 14px;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+}
+.dropdown-item:hover,
+.dropdown-item:focus { background: #f2f2f2; outline: none; }
+
+/* ============================================================
+   Options / Settings (options.html)
+   ============================================================ */
+body.options { max-width: 560px; margin: 24px auto; padding: 0 16px; }
+body.options hr { margin: 26px 0; }
+body.options input[type="text"] { width: 100%; padding: 6px 8px; }
+
+h1 { font-size: 20px; margin-bottom: 4px; }
+h2 { font-size: 15px; margin-top: 28px; margin-bottom: 4px; }
+label { display: block; font-size: 13px; font-weight: 600; margin: 12px 0 4px; }
+.hint { font-size: 12px; color: #666; margin-top: 3px; }
+.actions { margin-top: 16px; display: flex; align-items: center; gap: 10px; }
+.status { font-size: 13px; color: #197719; }
+.error { font-size: 12px; color: #b00020; }
+
+.add-row { display: flex; gap: 8px; margin-top: 12px; }
+.add-row input { flex: 1 1 0; min-width: 0; }
+
+/* Shared editable-list styling (Quick links + Bookmarks) */
+.list-item { display: flex; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee; }
+.list-item .meta { flex: 1; min-width: 0; }
+.list-item .label { font-size: 14px; font-weight: 600; }
+.list-item .url { font-size: 12px; color: #666; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.list-item .remove { flex-shrink: 0; color: #b00020; background: #fff; border: 1px solid #ddd; border-radius: 4px; }
+
+/* Secondary "Reset to default" button */
+.reset-btn { display: block; margin-top: 12px; background: #fff; border: 1px solid #ccc; color: #555; border-radius: 4px; }
+.reset-btn:hover { background: #f2f2f2; color: #000; }
