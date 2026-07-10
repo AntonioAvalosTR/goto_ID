@@ -29,6 +29,10 @@
     {
       "label": "Wiki",
       "url": "https://dev.azure.com/tr-design/Design%20Organization/_wiki/wikis/Design-Organization.wiki/77/Saffron-wiki"
+    },
+    {
+      "label": "Assigned to me",
+      "url": "https://dev.azure.com/tr-design/Design%20Organization/_sprints/taskboard/Saffron%20Design%20System/Design%20Organization/?System.AssignedTo=%40me"
     }
   ]
 }

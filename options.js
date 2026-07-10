@@ -71,6 +71,7 @@ function createEditableList({ storageKey, listEl, labelInput, urlInput, addButto
       const remove = document.createElement("button");
       remove.className = "remove";
       remove.textContent = "Remove";
+      remove.setAttribute("aria-label", `Remove ${item.label}`);
       remove.addEventListener("click", () => {
         items.splice(index, 1);
         persist();

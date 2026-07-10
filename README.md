@@ -2,7 +2,7 @@
 
 A tiny local Chrome extension for Azure DevOps. Type a work item **ID** to jump straight to it, or type **any text** to run a scoped work-item **search** — plus one-click quick links and a bookmarks dropdown for the places you visit most.
 
-**New in v3:** a **Settings page** lets you customize everything without touching code — the Azure DevOps target (org / project / area path), the quick-link buttons, and the bookmarks. Each section has a **Reset to default** button, and a **cog icon** in the popup header opens Settings in one click.
+**New in v3:** a **Settings page** lets you customize everything without touching code — the Azure DevOps target (org / project / area path), the quick-link buttons, and the bookmarks. Each section has a **Reset to default** button, a **cog icon** in the popup header opens Settings, and a keyboard shortcut (**Ctrl+Shift+G**) opens the popup from anywhere.
 
 ---
 
@@ -33,11 +33,11 @@ That's it. To get updates later, `git pull` and then click the **reload** icon (
 
 ## Use
 
-1. Click the toolbar button. The popup header shows the title and a **cog** (opens Settings).
+1. Open the popup — click the toolbar button or press **Ctrl+Shift+G** (**⌘+Shift+G** on Mac). The header shows the title and a **cog** that opens Settings.
 2. Type or paste into the box:
    - **A work item ID** (all digits) → opens that work item directly.
    - **Any text** (a word or phrase with letters) → opens a scoped ADO work-item search for those terms, limited to your configured area path. Spaces and special characters are encoded automatically, so searching `apply borderRadius` just works.
-3. Press **Enter** (or click the button).
+3. Press **Enter**, or click the **magnifying-glass** button.
 
 The result opens in a new tab and the popup closes.
 
@@ -69,10 +69,11 @@ Both lists are seeded from `links.json` the first time you open Settings, so you
 | File | What it does |
 | --- | --- |
 | `manifest.json` | Extension config — name, version, icons, the `storage` permission, and the Settings page registration. |
-| `popup.html` | The popup UI: the header (title + cog), the input + button, the quick-link row, and the bookmarks dropdown. |
+| `popup.html` | The popup UI: the header (title + cog), the input + search button, the quick-link row, and the bookmarks dropdown. |
 | `popup.js` | Builds the URL from the input (digits → work item, text → scoped search) and opens it; renders the quick links and bookmarks. Reads the target, quick links, and bookmarks from Settings, with fallbacks. |
 | `options.html` | The Settings page UI (target + the two editable lists, each with a reset button). |
 | `options.js` | Loads/saves the target and both lists; one shared list manager powers Quick links and Bookmarks. |
+| `styles.css` | Shared styling for both the popup and the Settings page. |
 | `links.json` | The **default** quick links (`links`) and bookmarks (`bookmarks`) — used to seed Settings on first use and to restore on reset. |
 | `img/` | The toolbar/extension icons (16/32/48/128). |
 | `docs/Browser-Extensions.md` | A short explainer on how browser extensions work and their limits. Read this for building your own tools with the help of AI chats. |
@@ -90,6 +91,8 @@ Both lists are seeded from `links.json` the first time you open Settings, so you
 - **Open in a window instead of a tab:** in `popup.js`, swap `chrome.tabs.create({ url })` for `chrome.windows.create({ url })` inside the `openUrl` helper.
 
 - **The `storage` permission** (added in v3) is what lets the extension remember your Settings. It only stores your own configuration; it doesn't read pages, history, or anything else.
+
+- **Keyboard shortcut.** **Ctrl+Shift+G** (**⌘+Shift+G** on Mac) opens the popup from any tab. Change or clear it at `chrome://extensions/shortcuts`. If it doesn't fire right after loading, set it there once — Chrome applies suggested shortcuts at install time and won't always override an existing binding.
 
 - **Developer-mode prompts:** because this is an unpacked extension, Chrome may occasionally ask you to re-enable it after a restart, or warn about developer-mode extensions. That's normal for a personal tool and nothing to worry about.
 
