@@ -6,6 +6,8 @@ A tiny local Chrome extension for Azure DevOps. Type a work item **ID** to jump 
 
 **New in v3.1:** a **clipboard button** in the popup header copies a clean, shareable link to the work item on the current Azure DevOps page — turning ADO's messy URLs into your standard `…/_workitems/edit/<id>` format.
 
+**New in v3.2:** a collapsible **History** section under the input keeps your recent IDs, searches, and copied pages as one-click links.
+
 ---
 
 ## Why
@@ -49,6 +51,10 @@ Below the input is a row of **quick-link buttons**, and at the bottom a **Bookma
 
 > **Known issue (ADO behavior, not the tool):** On backlog and board views the URL carries `&workitem=<id>`, but ADO keeps the browser tab title on the backlog/board page rather than the item. Since the link's title comes from the tab, the copied link falls back to "Work item `<id>`" there. Open the item on its own page for the full titled link.
 
+**History.** Under the input is a collapsible **History** section (collapsed by default, and hidden entirely until there's something to show). Expand it to see your most recent actions — up to 6, newest first — each a link you can click to reopen: an **ID** you submitted, a **Search** you ran, or a page you **Copied**. A small text tag marks each type, and it's read aloud by screen readers as part of the link. Duplicates collapse to a single entry (the most recent moves to the top). Use **Clear** in the History header to empty it. History persists and syncs alongside your other settings.
+
+> **Note on saved links:** History (and your quick links and bookmarks) store the full URL built at the time the entry was created. If you later change the org, project, or area path in Settings, older entries keep pointing at the previous target. Clearing History and creating fresh entries picks up the new target.
+
 ---
 
 ## Customizing it (Settings)
@@ -77,7 +83,7 @@ The popup and Settings page are built to work with the keyboard and with screen 
 **Keyboard**
 - Open the popup from any tab with **Ctrl+Shift+G** (**⌘+Shift+G** on Mac); the input is focused automatically.
 - **Tab** / **Shift+Tab** move between controls; **Enter** runs the ID/search box and activates buttons and links.
-- In the **Bookmarks** dropdown, opening it moves focus to the first item, **Tab** cycles through the rest, and **Esc** closes it and returns focus to the Bookmarks button. The focused item shows a clear outline.
+- The **Bookmarks** and **History** dropdowns behave the same: opening moves focus to the first item, **Tab** cycles through the rest, and **Esc** closes it and returns focus to the toggle. The focused item shows a clear outline.
 
 **Screen readers**
 - Every control has a name — the ID/search box, the Settings fields, and the icon-only buttons (search, cog) all announce their purpose, and each **Remove** button names the item it removes (e.g. "Remove Wiki").
@@ -92,7 +98,7 @@ The popup and Settings page are built to work with the keyboard and with screen 
 | File | What it does |
 | --- | --- |
 | `manifest.json` | Extension config — name, version, icons, the `storage` + `activeTab` permissions, and the Settings page registration. |
-| `popup.html` | The popup UI: the header (title + copy-link + cog), the input + search button, the quick-link row, and the bookmarks dropdown. |
+| `popup.html` | The popup UI: the header (title + copy-link + cog), the input + search button, the History section, the quick-link row, and the bookmarks dropdown. |
 | `popup.js` | Builds the URL from the input (digits → work item, text → scoped search) and opens it; renders the quick links and bookmarks. Reads the target, quick links, and bookmarks from Settings, with fallbacks. |
 | `options.html` | The Settings page UI (target + the two editable lists, each with a reset button). |
 | `options.js` | Loads/saves the target and both lists; one shared list manager powers Quick links and Bookmarks. |

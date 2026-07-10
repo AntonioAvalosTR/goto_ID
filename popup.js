@@ -6,6 +6,10 @@ const DEFAULTS = {
   area: "designOrg\\Saffron Design System",
 };
 
+// How many History entries to keep. For now this is a constant so we can test;
+// it's kept as a single variable so it can move to the Settings page later.
+const MAX_HISTORY = 6;
+
 // Live config, overridden from chrome.storage on load.
 let config = { ...DEFAULTS };
 
@@ -18,6 +22,10 @@ const bookmarksSection = document.querySelector(".bookmarks");
 const openOptionsButton = document.getElementById("openOptions");
 const copyLinkButton = document.getElementById("copyLink");
 const copyStatus = document.getElementById("copyStatus");
+const historySection = document.querySelector(".history");
+const historyToggle = document.getElementById("historyToggle");
+const historyMenu = document.getElementById("historyMenu");
+const clearHistoryButton = document.getElementById("clearHistory");
 
 // --- Open a URL in a new tab and close the popup ---
 function openUrl(url) {
@@ -31,25 +39,91 @@ function workItemUrl(id) {
   return `https://dev.azure.com/${config.org}/${project}/_workitems/edit/${id}`;
 }
 
-// --- Submit: all digits => open that work item; any text => ADO search ---
-function go() {
-  const query = input.value.trim();
-  if (!query) return;                       // nothing entered, do nothing
-
-  if (/^\d+$/.test(query)) {
-    openUrl(workItemUrl(query));            // pure number => open that work item
-    return;
-  }
-  // Contains non-digits => scoped ADO work-item search.
+// --- Build the scoped ADO work-item search URL for some keywords ---
+function searchUrl(query) {
   const project = encodeURIComponent(config.project);
   const area = encodeURIComponent(config.area);
   const keywords = encodeURIComponent(query);
-  openUrl(`https://dev.azure.com/${config.org}/${project}/_search?text=${keywords}&type=workitem&lp=workitems-Team&filters=Projects%7B${project}%7DArea%20Paths%7B${project}%5C${area}%7D&pageSize=25`);
+  return `https://dev.azure.com/${config.org}/${project}/_search?text=${keywords}&type=workitem&lp=workitems-Team&filters=Projects%7B${project}%7DArea%20Paths%7B${project}%5C${area}%7D&pageSize=25`;
+}
+
+// --- History ------------------------------------------------------------
+// Persisted in chrome.storage.sync, de-duped by URL, newest first, capped at
+// MAX_HISTORY. Each entry: { type: "id" | "search" | "copy", label, url }.
+// The full URL is stored at creation time (see the disclaimer on the options page).
+async function recordHistory(entry) {
+  try {
+    const { history = [] } = await chrome.storage.sync.get(["history"]);
+    const deduped = history.filter((h) => h.url !== entry.url);   // no duplicates
+    deduped.unshift(entry);                                        // newest on top
+    const trimmed = deduped.slice(0, MAX_HISTORY);
+    await chrome.storage.sync.set({ history: trimmed });
+    return trimmed;
+  } catch (e) {
+    console.error("Could not record history:", e);
+    return null;
+  }
+}
+
+// Short text tag shown (and read by screen readers) before each history label.
+function tagText(type) {
+  if (type === "id") return "ID";
+  if (type === "search") return "Search";
+  return "Copied";
+}
+
+function renderHistory(items) {
+  historyMenu.innerHTML = "";
+  if (!items || items.length === 0) {
+    historySection.hidden = true;             // nothing to show => hide the section
+    return;
+  }
+  historySection.hidden = false;
+  for (const item of items) {
+    const li = document.createElement("li");
+    const link = document.createElement("a");
+    link.className = "dropdown-item history-item";
+    link.href = item.url;                     // real href: right-click / copy works
+    link.title = item.label;                  // full label on hover if truncated
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      openUrl(item.url);
+    });
+
+    const tag = document.createElement("span");
+    tag.className = "history-tag";
+    tag.textContent = tagText(item.type);     // "ID" / "Search" / "Copied"
+
+    const label = document.createElement("span");
+    label.className = "history-label";
+    label.textContent = item.label;
+
+    link.append(tag, label);                  // name reads e.g. "Search apply borderRadius"
+    li.appendChild(link);
+    historyMenu.appendChild(li);
+  }
+}
+
+// --- Submit: all digits => open that work item; any text => ADO search ---
+// async so we can await the history write before the popup closes.
+async function go() {
+  const query = input.value.trim();
+  if (!query) return;                         // nothing entered, do nothing
+
+  if (/^\d+$/.test(query)) {
+    const url = workItemUrl(query);           // pure number => open that work item
+    await recordHistory({ type: "id", label: `#${query}`, url });
+    openUrl(url);
+    return;
+  }
+  const url = searchUrl(query);               // contains non-digits => scoped search
+  await recordHistory({ type: "search", label: query, url });
+  openUrl(url);
 }
 
 button.addEventListener("click", go);
 input.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") go();              // type/paste + Enter, no mouse
+  if (e.key === "Enter") go();                // type/paste + Enter, no mouse
 });
 
 // --- Header cog: open the extension's Settings (options) page ---
@@ -161,9 +235,16 @@ async function copyWorkItemLink() {
     copyStatus.textContent = "No work item ID on this page. Click on the top-left ID link first.";
     return;
   }
+  const url = workItemUrl(id);
   const label = labelFromTitle(tab.title, id);
-  const ok = await copyRichLink(workItemUrl(id), label);
-  copyStatus.textContent = ok ? `Copied link to #${id}.` : "Couldn't copy to the clipboard.";
+  const ok = await copyRichLink(url, label);
+  if (ok) {
+    copyStatus.textContent = `Copied link to #${id}.`;
+    const updated = await recordHistory({ type: "copy", label, url });  // only on success
+    if (updated) renderHistory(updated);      // show it without reopening the popup
+  } else {
+    copyStatus.textContent = "Couldn't copy to the clipboard.";
+  }
 }
 
 copyLinkButton.addEventListener("click", copyWorkItemLink);
@@ -196,10 +277,10 @@ function buildMenuItems(items, container) {
 }
 
 // --- Load config + content ---
-// Settings, quick links, and bookmarks all come from chrome.storage (options page).
+// Settings, quick links, bookmarks, and history all come from chrome.storage.
 // Each falls back to the bundled defaults (DEFAULTS / links.json) if never customized.
 async function init() {
-  const stored = await chrome.storage.sync.get(["settings", "links", "bookmarks"]);
+  const stored = await chrome.storage.sync.get(["settings", "links", "bookmarks", "history"]);
 
   if (stored.settings) {
     config = {
@@ -230,6 +311,8 @@ async function init() {
   } else {
     bookmarksSection.hidden = true;               // no bookmarks => hide the dropdown entirely
   }
+
+  renderHistory(Array.isArray(stored.history) ? stored.history : []);
 }
 
 init();
@@ -252,4 +335,30 @@ bookmarksSection.addEventListener("keydown", (e) => {
     bookmarksToggle.setAttribute("aria-expanded", "false");
     bookmarksToggle.focus();
   }
+});
+
+// --- History dropdown open/close, Escape, and Clear ---
+historyToggle.addEventListener("click", () => {
+  const opening = historyMenu.hidden;
+  historyMenu.hidden = !opening;
+  historyToggle.setAttribute("aria-expanded", String(opening));
+  if (opening) {
+    const firstItem = historyMenu.querySelector(".dropdown-item");
+    if (firstItem) firstItem.focus();                // move focus into the menu
+  }
+});
+
+historySection.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && !historyMenu.hidden) {
+    historyMenu.hidden = true;
+    historyToggle.setAttribute("aria-expanded", "false");
+    historyToggle.focus();
+  }
+});
+
+clearHistoryButton.addEventListener("click", async () => {
+  await chrome.storage.sync.set({ history: [] });
+  renderHistory([]);                                 // empties the list and hides the section
+  copyStatus.textContent = "History cleared.";       // announced via the status line
+  input.focus();                                     // move focus somewhere sensible
 });
