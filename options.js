@@ -14,9 +14,8 @@ const settingsStatus = document.getElementById("settingsStatus");
 
 // --- Settings ---
 function flashStatus(text) {
-  settingsStatus.textContent = text;
-  settingsStatus.hidden = false;
-  setTimeout(() => (settingsStatus.hidden = true), 1500);
+  settingsStatus.textContent = text;                 // role="status" announces the change
+  setTimeout(() => { settingsStatus.textContent = ""; }, 1500);
 }
 
 saveButton.addEventListener("click", () => {

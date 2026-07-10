@@ -13,20 +13,20 @@
         <h2>Azure DevOps target</h2>
 
         <label for="org">Organization</label>
-        <input id="org" type="text" placeholder="tr-design">
-        <div class="hint">The org segment of the URL: dev.azure.com/<b>&lt;org&gt;</b>/…</div>
+        <input id="org" type="text" placeholder="tr-design" aria-describedby="orgHint">
+        <div id="orgHint" class="hint">The org segment of the URL: dev.azure.com/<b>&lt;org&gt;</b>/…</div>
 
         <label for="project">Project</label>
-        <input id="project" type="text" placeholder="Design Organization">
-        <div class="hint">Plain text — no URL-encoding. Spaces are fine (e.g. "Design Organization").</div>
+        <input id="project" type="text" placeholder="Design Organization" aria-describedby="projectHint">
+        <div id="projectHint" class="hint">Plain text — no URL-encoding. Spaces are fine (e.g. "Design Organization").</div>
 
         <label for="area">Area path</label>
-        <input id="area" type="text" placeholder="designOrg\Saffron Design System">
-        <div class="hint">The path <em>below</em> the project, used to scope searches. Don't include the project name. Mind the casing (e.g. lowercase "designOrg").</div>
+        <input id="area" type="text" placeholder="designOrg\Saffron Design System" aria-describedby="areaHint">
+        <div id="areaHint" class="hint">The path <em>below</em> the project, used to scope searches. Don't include the project name. Mind the casing (e.g. lowercase "designOrg").</div>
 
         <div class="actions">
             <button id="save">Save settings</button>
-            <span id="settingsStatus" class="status" hidden>Saved</span>
+            <span id="settingsStatus" class="status" role="status"></span>
         </div>
         <button id="resetSettings" class="reset-btn">Reset to default</button>
 
@@ -40,7 +40,7 @@
             <input id="newLinkUrl" type="text" placeholder="https://…" aria-label="New quick link URL">
             <button id="addLink">Add</button>
         </div>
-        <div id="addLinkError" class="error"></div>
+        <div id="addLinkError" class="error" role="alert"></div>
 
         <div id="linkList"></div>
         <button id="resetLinks" class="reset-btn">Reset to default</button>
@@ -55,7 +55,7 @@
             <input id="newUrl" type="text" placeholder="https://…" aria-label="New bookmark URL">
             <button id="add">Add</button>
         </div>
-        <div id="addError" class="error"></div>
+        <div id="addError" class="error" role="alert"></div>
 
         <div id="bookmarkList"></div>
         <button id="resetBookmarks" class="reset-btn">Reset to default</button>
